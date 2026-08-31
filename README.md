@@ -1,371 +1,352 @@
-<img src="logo.png" alt="Mupi Systems Logo" width="200"/>
+# Brezelle
 
-# Desenvolvedor(a) Júnior Full Stack
+Portal de submissão de propostas de collab para uma marca fictícia de streetwear premium. Artistas, criadores e outras marcas enviam ideias pela landing page; a equipe Brezelle acompanha, filtra e atualiza as propostas pelo painel interno.
 
-## Sobre o teste
+## Stack e versões recomendadas
 
-Bem-vindo(a) ao teste técnico para a vaga de Desenvolvedor(a) Júnior Full Stack na Mupi Systems!
+| Camada | Tecnologia | Versão recomendada |
+|---|---|---:|
+| Frontend | Next.js App Router | 15.4.6 |
+| Linguagem web | TypeScript | 5.8.3 |
+| UI | Tailwind CSS | 3.4.17 |
+| Runtime web | Node.js | 22 LTS |
+| Gerenciador web | npm | 10+ |
+| Backend | Go | 1.22+ |
+| Banco | SQLite via `modernc.org/sqlite` | 1.30.1 |
+| Autenticação | JWT via `golang-jwt/jwt` | 5.2.1 |
 
-### O que você vai construir?
+As versões exatas das dependências web estão em [`web/package.json`](web/package.json) e [`web/package-lock.json`](web/package-lock.json). As dependências Go estão em [`api/go.mod`](api/go.mod) e [`api/go.sum`](api/go.sum).
 
-Um sistema web com três partes:
+## Requisitos
 
-1. **Uma página pública**: apresenta um negócio ou projeto de sua escolha e tem um formulário
-2. **Registros no banco**: o que chega pelo formulário é salvo com status "pendente"
-3. **Um painel de gestão**: onde o admin faz login, acompanha os registros que chegam e gerencia as opções que a página oferece
+Para desenvolvimento local:
 
-E sobre o quê? Isso é 100% seu. Agendamento numa barbearia, inscrição num curso, pedido de orçamento numa assistência técnica, reserva de mesa num restaurante, pedido de adoção numa ONG de animais... qualquer coisa em que alguém de fora envia uma solicitação e alguém de dentro gerencia o que chega.
+- Node.js 22 LTS e npm 10 ou superior
+- Go 1.22 ou superior
+- Git
 
-Essa liberdade não é enfeite: criatividade é o nosso maior critério de avaliação. Tanto na forma de resolver o problema quanto nas escolhas que você faz pelo caminho.
+Para executar com containers:
 
-Ao longo deste documento vamos chamar essa solicitação de "registro". No seu projeto, dê a ela o nome do seu tema: agendamento, inscrição, pedido, reserva, o que for.
+- Docker Engine 24+
+- Docker Compose v2 (`docker compose`, com espaço)
 
-### Como funciona?
+Não é necessário instalar SQLite separadamente: o banco é um arquivo local criado pela API.
 
-**Visitante**: acessa a página pública, escolhe uma das opções oferecidas, preenche o formulário e envia. O registro é salvo no banco como "pendente".
+## Começo rápido com Docker
 
-**Administrador**: faz login no painel, encontra os registros ordenados por data, filtra, busca, confirma ou cancela cada um, e mantém a lista de opções que a página pública mostra.
+Na raiz do projeto:
 
-### O que esperamos?
+```bash
+docker compose up --build
+```
 
-- Que funcione aquilo que você entregou
-- Código que você entende e consegue explicar
-- Decisões conscientes registradas, inclusive as decisões de não fazer algo
-- Pelo menos uma coisa que a gente não pediu (pode ser pequena!)
-- Interface com a cara do tema escolhido, responsiva e limpa
-- Testes automatizados nos fluxos centrais
-- README que faz o projeto rodar sem você por perto
+Depois, abra:
 
-### E antes de tudo: não precisa estar completo
+- Aplicação: <http://localhost:3000>
+- API: <http://localhost:8080>
+- Painel: <http://localhost:3000/admin/login>
 
-Entrega parcial é entrega, e o raciocínio por trás dela pesa muito. Mas vale ser transparente: por ser uma vaga júnior, o piso aqui é mais alto do que seria num estágio. Se precisar cortar, corte pelas bordas e proteja o núcleo: formulário salvando, painel protegido funcionando, status mudando.
+O volume `brezelle-data` persiste o SQLite entre reinicializações. Para acompanhar os logs:
 
-Se em algum momento a lista abaixo parecer grande demais, leia a seção [E se não der tempo de fazer tudo?](#e-se-não-der-tempo-de-fazer-tudo) antes de desistir.
+```bash
+docker compose logs -f api
+docker compose logs -f web
+```
 
-## A stack é sua escolha
+Para parar os containers:
 
-Não vamos dizer qual tecnologia usar. Você decide, e essa decisão faz parte da avaliação.
+```bash
+docker compose down
+```
 
-Laravel, Rails, Express, FastAPI, Next.js, Django, Spring, .NET, Go, Flask... tanto faz. Renderizado no servidor ou SPA, tanto faz. Postgres, MySQL, Mongo ou um SQLite num arquivo, tanto faz.
+Para remover também o banco persistido e começar do zero:
 
-### Um conselho antes de escolher
+```bash
+docker compose down -v
+```
 
-Escolha o que você já conhece. Este não é um teste de aprender stack nova do zero. Escolher algo desconhecido só para impressionar costuma dar errado, e aparece na conversa. Ferramenta que você domina vale mais que ferramenta da moda.
+> Atenção: `down -v` remove os dados locais do volume, incluindo propostas cadastradas.
 
-### O que a escolha precisa entregar
+## Desenvolvimento local
 
-Seja qual for a stack:
+### 1. Inicie a API
 
-- Roda na máquina de outra pessoa seguindo só o seu README
-- Autenticação pronta é permitida (Auth.js, Supabase, Devise, Passport, a do seu framework...). O que não vale é não saber explicar o que ela faz
-- O sistema é desenvolvido por você, não montado num serviço pronto (Calendly, Google Forms...)
-- Repositório com histórico de commits
+```bash
+cd api
+go mod download
+go run .
+```
 
-No `DECISOES.md`, conte por que escolheu essa stack: o que você ganhou e o que perdeu com a escolha.
+A API executa na porta `8080`, cria as tabelas automaticamente e insere o seed na primeira inicialização.
 
-## Objetivos
+### 2. Em outro terminal, inicie o frontend
 
-- Desenvolver uma página pública com formulário funcional
-- Construir um painel de gestão protegido por login, com ações de verdade: mudar status, gerenciar opções
-- Demonstrar que você consegue ler uma especificação e traduzi-la em código
-- Mostrar capacidade de decidir sob ambiguidade e de organizar código
-- Criar uma interface responsiva e funcional, com os fluxos centrais cobertos por testes
+```bash
+cd web
+npm ci
+npm run dev
+```
 
-## Instruções
+Abra <http://localhost:3000>. O frontend usa `http://localhost:8080` como URL padrão da API.
 
-### Fork do repositório
+Durante o desenvolvimento, `npm ci` é preferível porque instala exatamente o conteúdo do lockfile. Use `npm install` somente quando precisar atualizar dependências.
 
-1. Faça um fork deste repositório para sua conta pessoal do GitHub
-2. Trabalhe no seu próprio fork
+### Comandos úteis do frontend
 
-### Implementação
+```bash
+npm run dev       # servidor de desenvolvimento
+npm run build     # build de produção
+npm run start     # serve o build de produção
+npm run lint      # lint configurado no projeto
+```
+
+### Comandos úteis da API
+
+```bash
+go test ./...     # testes automatizados
+go vet ./...      # análise estática
+go run .          # executa a API
+```
+
+## Variáveis de ambiente
+
+### API
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `PORT` | `8080` | Porta HTTP da API |
+| `DB_PATH` | `./brezelle.db` | Caminho do arquivo SQLite |
+| `JWT_SECRET` | `brezelle-development-secret-change-me` | Segredo usado para assinar os tokens |
+| `CORS_ORIGIN` | `http://localhost:3000` | Origem permitida para CORS |
+
+Exemplo:
+
+```bash
+cd api
+JWT_SECRET="um-segredo-local-forte" DB_PATH="./data/brezelle.db" go run .
+```
+
+O diretório informado em `DB_PATH` precisa existir antes de iniciar a API.
+
+### Web
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `API_URL` | `http://localhost:8080` | URL usada pelo BFF do Next para falar com o Go |
+
+No Docker, `API_URL` é `http://api:8080`, pois `api` é o nome do serviço na rede interna do Compose. O navegador acessa apenas o Next em `localhost:3000`.
+
+Os templates ficam em [`api/.env.example`](api/.env.example) e [`web/.env.example`](web/.env.example). Para a API, exporte as variáveis no shell antes de executar `go run .`; o Go não carrega arquivos `.env` automaticamente. Para o frontend, o Next.js pode carregar as variáveis a partir de `web/.env.local`.
+
+Exemplo de configuração local:
+
+```bash
+cp api/.env.example api/.env
+cp web/.env.example web/.env.local
+set -a
+source api/.env
+set +a
+```
+
+Os arquivos `.env` e `.env.local` não devem ser commitados.
 
-Desenvolva o projeto conforme os requisitos abaixo, no tema e na stack que você escolher.
+## Credenciais de demonstração
+
+O seed cria automaticamente um administrador:
+
+```text
+Email: admin@brezelle.com
+Senha: admin123
+```
+
+Em qualquer ambiente real, substitua o `JWT_SECRET` padrão e altere as credenciais de demonstração antes de expor a aplicação.
+
+## Arquitetura
 
-### Submissão
+```text
+Browser
+  │
+  ▼
+Next.js :3000
+  ├─ páginas e componentes React
+  ├─ Route Handlers BFF (/api/*)
+  └─ cookie httpOnly com JWT
+        │
+        ▼
+Go REST API :8080
+  ├─ validação e regras de negócio
+  ├─ JWT e middleware protegido
+  └─ SQLite + migrations + seed
+```
+
+O Go gera o JWT. O BFF do Next recebe o token no login e o grava em cookie `httpOnly`, `sameSite=lax` e com duração de 24 horas. Nas requisições protegidas, o BFF lê o cookie no servidor e envia o token para a API; o token não fica disponível para JavaScript no navegador.
+
+## Estrutura de pastas
+
+```text
+.
+├── api/
+│   ├── db/                  # conexão, migrations e seed
+│   ├── handlers/            # handlers REST e regras de validação
+│   ├── middleware/          # autenticação JWT
+│   ├── models/              # modelos de resposta
+│   ├── main.go
+│   └── handlers/*_test.go
+├── web/
+│   ├── app/                 # rotas Next.js e Route Handlers BFF
+│   ├── components/
+│   │   ├── LandingPage/     # hero, manifesto, proposta e footer
+│   │   ├── AdminPage/        # dashboard, métricas, inbox e tipos
+│   │   ├── AdminLoginPage/
+│   │   ├── Navbar/
+│   │   └── Footer/
+│   ├── public/videos/        # vídeo original, versão web e frame final
+│   └── lib/api.ts            # tipos compartilhados do frontend
+├── docker-compose.yml
+├── DECISOES.md
+└── README.md
+```
 
-1. Após finalizar, abra um Pull Request do seu fork para o repositório original
-2. Na descrição do PR, inclua:
-   - O que você adicionou além do que foi pedido, e por quê
-   - O que você decidiu não fazer, e por quê
-   - Onde você teve dificuldade
-3. Aguarde o agendamento da reunião para avaliação do teste
+As páginas em `web/app` funcionam como entry points. A composição visual fica em pastas por página e seção, por exemplo:
 
-### Documentação
+```text
+web/components/LandingPage/HeroSection/HeroSection.tsx
+web/components/LandingPage/ProposalSection/ProposalSection.tsx
+web/components/AdminPage/SubmissionsSection/SubmissionsSection.tsx
+```
 
-Dois arquivos no repositório:
+## Fluxos da aplicação
 
-| Arquivo | Conteúdo |
-|---------|----------|
-| `README.md` | Descrição do projeto, stack utilizada e passo a passo para rodar |
-| `DECISOES.md` | Suas decisões (incluindo tema e stack) e como você usou IA |
+### Landing pública
 
-O `DECISOES.md` pode ser curto. Uma página inteira já é mais do que precisamos. Queremos clareza, não volume.
+1. O visitante visualiza o hero e as opções de collab ativas.
+2. Preenche marca/artista, email, Instagram, formato, data e pitch.
+3. A validação acontece no frontend e novamente na API.
+4. Uma submissão válida é criada com status `pending` e o feedback aparece na própria página.
 
-## Requisitos funcionais
+O hero usa `public/videos/hero-video.mp4` como fonte original. Para entrega no browser, usa `hero-video-web.mp4`, reproduz do início até aproximadamente `12,2s` e então revela o frame estático `hero-final-frame.jpg`, sem loop.
 
-Descritos por comportamento, não por tecnologia. Como implementar é com você.
+### Painel administrativo
 
-### Dados
+1. `/admin` verifica o cookie e redireciona para `/admin/login` quando a sessão é inválida.
+2. O painel lista propostas ordenadas por `proposed_date`.
+3. A listagem aceita filtro por status, busca por marca/email e paginação.
+4. Ações de confirmar/cancelar atualizam a interface imediatamente e registram o histórico.
+5. O administrador pode criar, editar, ativar e desativar tipos de collab.
 
-Aqui a modelagem cresce um pouco em relação a um formulário simples: as opções que a página oferece também são dados, gerenciados pelo painel. Nada de lista fixa no código.
+## API REST
 
-Uma opção precisa guardar:
+### Rotas públicas
 
-| Campo | Observação |
-|-------|------------|
-| **título** | O nome da opção: o serviço, a turma, o tipo de pedido... |
-| **ativa** | Se aparece ou não na página pública e no formulário |
+| Método | Rota | Função |
+|---|---|---|
+| `POST` | `/submissions` | Cria uma proposta com status `pending` |
+| `GET` | `/collab-types` | Lista somente tipos ativos |
+| `POST` | `/auth/login` | Valida credenciais e retorna JWT |
 
-Acrescente o que o seu tema pedir: preço, duração, vagas... Deixe pelo menos 3 opções cadastradas via seed.
+### Rotas protegidas
 
-Um registro precisa guardar:
+Enviam `Authorization: Bearer <token>` ou o cookie `brezelle_token`.
 
-| Campo | Observação |
-|-------|------------|
-| **nome** | Nome de quem preencheu o formulário |
-| **email** | Email de quem preencheu |
-| **opção** | Referência à opção escolhida |
-| **data** | Uma data que faça sentido no seu tema: data do agendamento, do evento, da reserva, prazo desejado... |
-| **horário** | Se fizer sentido no tema. Se não tiver, troque por outro campo que o seu tema pedir |
-| **status** | Restrito a: `pendente`, `confirmado`, `cancelado`. Nasce sempre como `pendente` |
-| **criado_em** | Quando o registro foi criado |
-| **atualizado_em** | Quando o registro mudou pela última vez |
+| Método | Rota | Função |
+|---|---|---|
+| `POST` | `/auth/logout` | Finaliza o fluxo de logout |
+| `GET` | `/submissions` | Lista propostas com filtros e paginação |
+| `PATCH` | `/submissions/:id` | Atualiza o status da proposta |
+| `GET` | `/collab-types/all` | Lista tipos ativos e inativos |
+| `POST` | `/collab-types` | Cria um tipo |
+| `PATCH` | `/collab-types/:id` | Edita título e/ou status ativo |
 
-Os nomes dos campos são seus: em português, em inglês, camelCase, o que a sua stack pedir. O que importa é a informação estar lá.
+### Parâmetros da listagem
 
-### Comportamentos
+`GET /submissions?status=pending&search=studio&page=1&limit=10`
 
-| # | O que precisa acontecer |
-|---|--------------------------|
-| 1 | Visitante acessa a página pública e vê informações do negócio/projeto e as opções ativas |
-| 2 | Visitante envia o formulário e o registro é persistido com status `pendente` |
-| 3 | Dados inválidos não entram no banco: validação no frontend e no backend, com mensagens claras |
-| 4 | Visitante recebe confirmação visual de que o envio deu certo |
-| 5 | Visitante que tenta acessar o painel sem estar autenticado é barrado e enviado para o login |
-| 6 | Admin faz login com credenciais válidas, chega no painel e consegue sair quando quiser (logout) |
-| 7 | Painel lista todos os registros, ordenados por data, com o status de cada um visível |
-| 8 | Painel tem filtro por status, busca por nome ou email e paginação (continua usável com centenas de registros) |
-| 9 | Admin confirma ou cancela um registro e vê o resultado na hora |
-| 10 | Admin cria, edita e desativa opções, e a página pública reflete a mudança |
+- `status`: `pending`, `confirmed` ou `cancelled`
+- `search`: procura em `brand_name` e `email`
+- `page`: começa em `1`
+- `limit`: padrão `10`, máximo `100`
 
-O item 5 é o que mais gente esquece de testar. Abra uma aba anônima e tente acessar o painel direto pela URL.
+A resposta inclui `data`, metadados de `pagination`, contadores globais por status e o histórico `logs` de cada proposta.
 
-### Interface
+### Exemplo: criar uma proposta
 
-- Design responsivo (mobile e desktop)
-- Status de cada registro visualmente identificável no painel (ex: badge colorida)
-- Ações do painel com feedback: depois do clique, dá para saber o que aconteceu
+```bash
+curl -X POST http://localhost:8080/submissions \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "brand_name": "Studio Norte",
+    "email": "hello@studionorte.com",
+    "instagram": "@studionorte",
+    "collab_type_id": 1,
+    "proposed_date": "2027-06-10",
+    "pitch": "Uma coleção que cruza materiais técnicos com a linguagem da cidade."
+  }'
+```
 
-#### Sobre CSS
+### Exemplo: login e consulta protegida
 
-Use o que quiser: Tailwind (via CDN, uma linha no `<head>`), CSS puro, a biblioteca de componentes da sua stack, o que for. Só não gaste tempo configurando toolchain. Batalhar com build de CSS não é o que estamos avaliando, então escolha o caminho mais curto até o resultado visual.
+```bash
+TOKEN=$(curl -s http://localhost:8080/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"admin@brezelle.com","password":"admin123"}' \
+  | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>console.log(JSON.parse(d).token))')
 
-### Testes
+curl "http://localhost:8080/submissions?page=1&limit=10" \
+  -H "Authorization: Bearer $TOKEN"
+```
 
-Não pedimos número de cobertura. Pedimos testes automatizados nos fluxos que não podem quebrar:
+## Banco de dados
 
-- Criar um registro válido (e recusar um inválido)
-- O painel barrado sem autenticação
-- A mudança de status
+Na inicialização, a API executa migrations idempotentes para criar:
 
-Se quiser testar mais, ótimo. Mas esses três já contam a história que queremos ler. No `DECISOES.md`, conte como você decidiu o que testar.
+- `admins`
+- `collab_types`
+- `submissions`
+- `submission_logs`
 
-### Qualidade de código
+O seed cadastra os três tipos ativos — `Coleção Cápsula`, `Drop Conjunto` e `Conteúdo Editorial` — e o administrador de demonstração. Desativar um tipo remove-o do formulário público, mas não remove nem invalida propostas já cadastradas.
 
-- Código organizado e legível
-- Estrutura de projeto coerente com as convenções da stack escolhida
-- README com instruções claras
+## Testes
 
-## O que a especificação não diz
+```bash
+cd api
+go test ./...
+```
 
-Esta especificação deixa espaço em aberto de propósito, e cada tema cria as próprias perguntas. Dois exemplos que valem para qualquer tema:
+Os testes automatizados cobrem os fluxos essenciais:
 
-- Como fica o painel quando ainda não chegou nenhum registro?
-- O que acontece com os registros de uma opção que o admin desativou?
+- criação de submissão válida e rejeição de submissão inválida;
+- bloqueio de rota protegida sem JWT;
+- alteração de status e criação do registro correspondente em `submission_logs`.
 
-Outras vão aparecer conforme o que você escolher construir. Você não precisa resolver tudo que encontrar. Precisa perceber que existe e registrar o que decidiu. Duas ou três linhas por item, no `DECISOES.md`, já valem nota cheia.
+## Troubleshooting
 
-## Além do mínimo
+### Porta já está em uso
 
-Os requisitos acima são o piso. Entregar tudo que foi pedido, bem feito, já é uma boa entrega. O que faz a gente lembrar de você é o que vem além. E "além" aqui é algo pequeno, não é outro projeto.
+Altere a porta da API localmente:
 
-### 1. Escolha 2 ou 3 melhorias e faça bem feito
+```bash
+cd api
+PORT=8081 go run .
+```
 
-Três coisas caprichadas valem mais que dez pela metade. Lista longa com acabamento zero conta contra, não a favor.
+E inicie o Next apontando para ela:
 
-### 2. Adicione pelo menos uma coisa que não pedimos
+```bash
+cd web
+API_URL=http://localhost:8081 npm run dev
+```
 
-Você é o desenvolvedor do produto. Olhe para a tela de quem vai gerenciar isso e pergunte: o que falta aqui para ser realmente usável na segunda-feira de manhã?
+No Docker, altere o mapeamento em `docker-compose.yml` se a porta `3000` ou `8080` estiver ocupada.
 
-Pode ser simples. Implemente e explique no PR por que aquilo importa.
+### O login não funciona
 
-### 3. Diga o que você decidiu não fazer
+Confirme que a API está rodando, que `API_URL` aponta para ela e que o seed foi executado. Se estiver usando Docker com um banco antigo, `docker compose down -v` recria o volume e executa o seed novamente.
 
-Liste no PR o que ficou de fora de propósito e o motivo. Saber cortar escopo vale tanto quanto saber implementar.
+### O formulário não mostra tipos
 
-<details>
-<summary><b>Sem ideias do que fazer a mais? (abra só se precisar)</b></summary>
+Teste `GET http://localhost:8080/collab-types`. Se a resposta vier vazia, verifique se os tipos foram desativados no painel ou se a API está usando um arquivo SQLite diferente através de `DB_PATH`.
 
-Coisas que costumam fazer sentido nesse tipo de sistema. Não é um checklist: se você só executar essa lista, o resultado é o de todo mundo.
+## Escopo e decisões
 
-- Deploy em algum lugar acessível, com o link no README
-- Notificação por email ao criar ou confirmar um registro (pode ser simulada, com um Mailhog da vida)
-- Histórico de mudanças de status: o que mudou, quando
-- Resumo no painel: contadores e, se fizer sentido, um gráfico simples
-- Proteção contra spam ou envios duplicados no formulário
-- Docker ou docker-compose para subir tudo com um comando
-- CI rodando os testes a cada push
-- Exportação da listagem (CSV)
-- Acessibilidade básica: navegação por teclado, contraste, labels
-- Capricho visual: microinterações, dark mode, ilustrações com a cara do tema
-
-</details>
-
-## Critérios de avaliação
-
-Vale repetir o que já dissemos lá em cima: o que mais avaliamos é criatividade. No tema, na solução, nos detalhes que você escolhe cuidar. Os critérios abaixo existem para dar chão a isso.
-
-### O básico: o que esperamos ver de pé
-
-- Formulário salva o registro no banco, com validação nas duas pontas
-- Painel protegido por login lista os registros ordenados por data, com filtro, busca e paginação
-- Admin muda status e gerencia as opções pelo painel
-- Os testes dos fluxos centrais existem e passam
-- O projeto roda seguindo o seu próprio README, sem passo faltando
-
-Fechou esses cinco? Você fez o teste. O que vem abaixo é o que diferencia uma entrega da outra.
-
-Não fechou algum? Não é eliminatório. Conte no PR o que ficou faltando e por quê. O raciocínio conta.
-
-### Desempate: o que faz a gente lembrar de você
-
-| O que olhamos | Como aparece na prática |
-|---------------|--------------------------|
-| Criatividade | O tema, a solução e os detalhes têm a sua cara, não a cara de um tutorial |
-| Julgamento | Percebeu as ambiguidades da especificação e decidiu conscientemente |
-| Solidez | Casos de erro tratados, testes que testam de verdade, nada quebra no primeiro clique errado |
-| Escolha de ferramenta | A stack faz sentido para o problema e você sabe dizer por que escolheu |
-| Iniciativa | Adicionou algo que não pedimos e soube dizer por que importa |
-| Priorização | Cortou escopo de propósito e explicou o corte |
-| Domínio | Entende o que entregou e consegue conversar sobre o próprio código |
-| Cuidado | Página com a cara do tema, estados vazios tratados, responsivo testado no celular |
-| Comunicação | README claro, PR bem escrito, commits que contam a história do trabalho |
-
-Não avaliamos qual tema nem qual stack você escolheu. Avaliamos se as escolhas foram conscientes e se você domina o que escolheu.
-
-## Diretrizes criativas
-
-### Página pública
-
-Liberdade criativa total: escolha qualquer tema em que uma pessoa envia uma solicitação e um admin gerencia, real ou fictício.
-
-Alguns exemplos, só para destravar:
-
-- Barbearia ou salão: agendamento de horário
-- Clínica (médica, odontológica, fisioterapia...): agendamento de consulta
-- Curso, workshop ou aula experimental: inscrição
-- Assistência técnica ou marcenaria: pedido de orçamento
-- Restaurante ou espaço de eventos: reserva
-- ONG de animais: pedido de adoção
-- Estúdio fotográfico: agendamento de ensaio
-- Ou qualquer outra combinação que você inventar
-
-A estrutura da página é livre. Poucas seções bem feitas valem mais que muitas espremidas, e não precisa ser uma landing page de agência.
-
-### Painel de gestão
-
-Um painel próprio para gerenciar os registros e as opções, com acesso controlado por autenticação.
-
-#### O fluxo que precisa funcionar
-
-1. Visitante acessa a rota do painel
-2. Como não está autenticado, é redirecionado para a tela de login
-3. Admin faz login com credenciais válidas
-4. É levado ao painel
-5. Vê os registros ordenados por data, filtra por status, busca por nome ou email, navega pelas páginas
-6. Confirma ou cancela registros
-7. Gerencia as opções oferecidas
-8. Consegue sair da sessão quando quiser
-
-#### O que você precisa montar
-
-| Peça | O que faz |
-|------|-----------|
-| Usuário admin | Um usuário com acesso ao painel. Documente no README como criá-lo |
-| Tela de login | Formulário de autenticação. Pode ser simples, não avaliamos o design dela |
-| Proteção da rota | Sem sessão válida, o painel não abre. Nem pela URL direta |
-| Logout | Um jeito de encerrar a sessão |
-| Listagem | Os campos do registro, com status visível, ordenados por data, com filtro, busca e paginação. Aqui vale caprichar |
-| Ações de status | Confirmar e cancelar, com feedback do que aconteceu |
-| Gestão de opções | Criar, editar e desativar as opções que a página pública oferece |
-
-Use a autenticação pronta da sua stack. Reinventar login do zero não impressiona ninguém. O que queremos ver é você sabendo usar e explicar a que já existe.
-
-## Rodando o projeto
-
-Como o seu projeto sobe depende da stack que você escolheu, então quem escreve essa parte é você, no README do seu repositório.
-
-O critério é simples, e a gente vai testar de verdade: uma pessoa que nunca viu seu projeto consegue clonar, seguir o seu README e ver a aplicação funcionando no navegador?
-
-Na prática, isso costuma significar cobrir:
-
-- Pré-requisitos (versão de linguagem, runtime, banco de dados...)
-- Instalação das dependências
-- Variáveis de ambiente, se houver (inclua um `.env.example`)
-- Preparo do banco (migrations, seed...)
-- Como criar o usuário admin
-- Como subir a aplicação e em qual endereço ela responde
-- Como rodar os testes
-
-O passo do usuário admin é o que mais falta nas entregas. Se a gente não conseguir entrar no painel, metade do teste fica invisível. Vale testar seu próprio README numa pasta limpa antes de enviar.
-
-## Notas importantes
-
-- Funcionar é pré-requisito. O diferencial é o cuidado e as decisões
-- Se a lista parecer grande, corte, e conte no PR o que cortou e por quê
-- Queremos ver o processo: commits incrementais com mensagens que fazem sentido valem mais que um único commit "projeto final"
-- Documentação, Stack Overflow, IA: tudo liberado. Veja a seção sobre IA abaixo
-- Simples e bem feito é melhor que complexo e quebrado
-
-## E se não der tempo de fazer tudo?
-
-Está tudo bem. Sério.
-
-Entregue do jeito que estiver e conte no Pull Request:
-
-- O que você conseguiu fazer
-- Onde travou, e o que tentou antes de travar
-- O que faria diferente com mais tempo
-
-Avaliamos o que você fez, não o tamanho do que faltou. Um projeto com metade dos requisitos e um raciocínio claro por trás das escolhas vale mais, para nós, do que um projeto completo que o candidato não sabe explicar.
-
-E vale repetir, porque é o que mais importa: o que estamos avaliando é a forma como você pensa. Como você prioriza, o que percebe, como decide quando falta tempo ou informação. Isso aparece igualmente bem numa entrega parcial. Às vezes até melhor, porque é justamente ao priorizar que a cabeça de alguém fica visível.
-
-O único cenário ruim é não entregar. Se você chegou até aqui, abra o PR. 😊
-
-## Sobre o uso de IA
-
-Assumimos que você vai usar IA. Nós usamos. Não tem problema nenhum nisso.
-
-Mas isso muda o que estamos avaliando. Se a IA escreve o CRUD em 20 minutos, o CRUD não diz nada sobre você. O que diz é o que você faz depois: o que percebeu que faltava, o que recusou da sugestão dela, e o que decidiu por conta própria.
-
-### No seu `DECISOES.md`
-
-Além das decisões técnicas, inclua uma seção curta sobre IA respondendo:
-
-1. O que você delegou para a IA e o que fez à mão, e por quê
-2. Uma vez em que a IA te deu algo ruim ou errado: o que era, como você percebeu, e o que fez no lugar
-3. Uma decisão que você tomou contra a sugestão da IA, e o motivo
-
-A pergunta 2 é a que mais nos interessa. Quem usa IA de verdade sempre tem essa história. Quem só copia e cola, não tem.
-
-Três parágrafos curtos resolvem. Não precisa de mais que isso.
-
-### E depois, na conversa
-
-Vamos conversar sobre o que você construiu: por que fez de um jeito e não de outro, o que te deu trabalho, o que você mudaria. Não é sabatina. É a mesma conversa que temos entre a gente quando alguém abre um PR.
-
-Por isso vale entregar código que você entende. Não porque vamos cobrar linha por linha, mas porque essa conversa é a parte mais interessante do processo, e é onde você tem mais espaço para mostrar como pensa.
-
-Boa sorte! A gente se vê na conversa.
+O projeto inclui, além do fluxo mínimo, histórico de mudanças de status e contadores no painel. Email de notificação, deploy e exportação CSV ficaram fora do escopo. Mais detalhes de arquitetura, trade-offs e uso de IA estão em [`DECISOES.md`](DECISOES.md).
