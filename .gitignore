@@ -1,0 +1,4 @@
+.env
+/vendor/
+*.log
+/storage/rate_limit/*.json
