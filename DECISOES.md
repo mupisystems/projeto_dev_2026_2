@@ -31,8 +31,14 @@ Os testes priorizam os três fluxos obrigatórios: entrada válida/recusa invál
 
 ## Uso de IA
 
-A IA foi usada como apoio de implementação e revisão: ajudou a estruturar handlers, componentes, validações, integração entre o BFF do Next e a API Go e a documentação inicial. As decisões de tema, arquitetura, regras de negócio, limites de paginação, tratamento de tipos inativos, escolha do frame final do vídeo e revisão dos testes foram avaliadas manualmente antes de serem mantidas.
+**O que foi delegado e o que foi feito à mão**
 
-Uma abordagem inicial de tela de carregamento sobre o hero se mostrou ruim para a experiência: adicionava uma etapa antes do conteúdo principal e não contribuía para o objetivo editorial da página. Ela foi removida, mantendo o hero como entrada direta do site; o vídeo passou a ser tratado apenas como mídia de fundo, com transição para o frame estático final.
+A IA foi usada como apoio de implementação e revisão: ajudou a estruturar handlers, componentes, validações, integração entre o BFF do Next e a API Go e a documentação inicial. As decisões de tema, arquitetura, regras de negócio, limites de paginação, tratamento de tipos inativos, escolha do frame final do vídeo e revisão dos testes foram avaliadas e tomadas manualmente antes de serem mantidas.
 
-Também não adotei uma solução simplificada que deixasse o token acessível no navegador ou expusesse diretamente a URL interna da API. Mantive o Next.js como BFF, com JWT em cookie `httpOnly`, porque essa decisão reduz a superfície de exposição do token e funciona melhor com a topologia do Docker Compose.
+**Onde a IA errou**
+
+Na geração inicial dos componentes do painel, a IA produziu arquivos extensos sem separação de responsabilidades — lógica de fetch, estado e renderização no mesmo componente. O código funcionava, mas estava monolítico e difícil de manter. Percebi o problema quando tentei localizar onde adicionar os contadores de status e o arquivo tinha mais de 400 linhas sem separação clara. Pedi uma refatoração com componentização explícita, separando seções como inbox, métricas e tipos de collab em componentes próprios. O resultado final é o que está no repositório.
+
+**Uma decisão tomada contra a sugestão da IA**
+
+A IA sugeriu gravar o JWT diretamente no `localStorage` do navegador por ser a abordagem mais simples de implementar. Recusei porque isso expõe o token a qualquer script na página. Mantive o Next.js como BFF, com o JWT gravado em cookie `httpOnly`, porque essa decisão reduz a superfície de exposição do token e funciona corretamente com a topologia do Docker Compose.
