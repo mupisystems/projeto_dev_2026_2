@@ -1,0 +1,8 @@
+api/*.db
+api/.env*
+!api/.env.example
+web/node_modules/
+web/.next/
+web/*.tsbuildinfo
+web/.env*
+!web/.env.example
