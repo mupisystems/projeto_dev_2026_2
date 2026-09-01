@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 )
 
 func main() {
+	loadDotEnv()
 	database, err := db.Open(env("DB_PATH", "./brezelle.db"))
 	if err != nil {
 		log.Fatal(err)
@@ -45,6 +47,35 @@ func main() {
 	port := env("PORT", "8080")
 	log.Printf("Brezelle API running on :%s", port)
 	log.Fatal(http.ListenAndServe(":"+port, cors(mux)))
+}
+
+func loadDotEnv() {
+	paths := []string{".env", "api/.env"}
+	for _, path := range paths {
+		file, err := os.Open(path)
+		if err != nil {
+			continue
+		}
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			line := strings.TrimSpace(scanner.Text())
+			if line == "" || strings.HasPrefix(line, "#") {
+				continue
+			}
+
+			key, value, found := strings.Cut(line, "=")
+			if !found {
+				continue
+			}
+			key = strings.TrimSpace(strings.TrimPrefix(key, "export "))
+			value = strings.Trim(strings.TrimSpace(value), "\"'")
+			if key != "" && os.Getenv(key) == "" {
+				_ = os.Setenv(key, value)
+			}
+		}
+		_ = file.Close()
+	}
 }
 
 func routeID(path, prefix string) int64 {

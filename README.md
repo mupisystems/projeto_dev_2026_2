@@ -77,7 +77,7 @@ go mod download
 go run .
 ```
 
-A API executa na porta `8080`, cria as tabelas automaticamente e insere o seed na primeira inicialização.
+A API executa na porta `8080` por padrão, carrega automaticamente o arquivo `api/.env` quando ele existe, cria as tabelas e insere o seed na primeira inicialização. Variáveis já exportadas no shell têm prioridade sobre o arquivo.
 
 ### 2. Em outro terminal, inicie o frontend
 
@@ -136,16 +136,13 @@ O diretório informado em `DB_PATH` precisa existir antes de iniciar a API.
 
 No Docker, `API_URL` é `http://api:8080`, pois `api` é o nome do serviço na rede interna do Compose. O navegador acessa apenas o Next em `localhost:3000`.
 
-Os templates ficam em [`api/.env.example`](api/.env.example) e [`web/.env.example`](web/.env.example). Para a API, exporte as variáveis no shell antes de executar `go run .`; o Go não carrega arquivos `.env` automaticamente. Para o frontend, o Next.js pode carregar as variáveis a partir de `web/.env.local`.
+Os templates ficam em [`api/.env.example`](api/.env.example) e [`web/.env.example`](web/.env.example). A API carrega automaticamente `api/.env` ao executar `go run .`; para o frontend, o Next.js pode carregar as variáveis a partir de `web/.env.local` ou `web/.env`.
 
 Exemplo de configuração local:
 
 ```bash
 cp api/.env.example api/.env
 cp web/.env.example web/.env.local
-set -a
-source api/.env
-set +a
 ```
 
 Os arquivos `.env` e `.env.local` não devem ser commitados.
