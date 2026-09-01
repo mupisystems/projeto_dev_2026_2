@@ -321,6 +321,14 @@ Os testes automatizados cobrem os fluxos essenciais:
 
 ## Troubleshooting
 
+### `docker compose` não encontrado
+
+Instale o plugin oficial:
+
+```bash
+sudo apt install docker-compose-v2
+```
+
 ### Porta já está em uso
 
 Altere a porta da API localmente:
