@@ -1,0 +1,92 @@
+# ===============
+# Dependências
+# ===============
+node_modules/
+.pnpm-store/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ===============
+# Build e artefatos
+# ===============
+dist/
+build/
+out/
+coverage/
+*.tsbuildinfo
+*.pid
+*.seed
+*.pid.lock
+
+# ===============
+# Ambiente e configurações locais
+# ===============
+.env
+.env.*
+!.env.example
+!.env.test.example
+
+# ===============
+# Logs
+# ===============
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+log/
+
+# ===============
+# Sistema operacional
+# ===============
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===============
+# IDEs e editores
+# ===============
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*.temp
+*.orig
+
+# ===============
+# Testes
+# ===============
+.nyc_output/
+coverage/
+*.lcov
+playwright-report/
+test-results/
+blob-report/
+
+# ===============
+# Prisma e banco local
+# ===============
+prisma/dev.db
+prisma/dev.db-journal
+*.sqlite
+*.sqlite3
+*.db
+
+# ===============
+# Docker e infraestrutura local
+# ===============
+postgres-data/
+pgdata/
+data/
+
+# ===============
+# Husky (arquivos gerados automaticamente)
+# ===============
+.husky/_/

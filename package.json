@@ -1,0 +1,42 @@
+{
+  "name": "desafio-mupi-systems",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema web de agendamento para clínica odontológica - Desafio Mupi Systems",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "lint": "npm run lint -w backend && npm run lint -w frontend",
+    "lint:fix": "npm run lint:fix -w backend && npm run lint:fix -w frontend",
+    "format": "prettier --write \"**/*.{ts,tsx,mjs,js,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,mjs,js,json,md,yml,yaml}\"",
+    "type-check": "npm run type-check -w backend && npm run type-check -w frontend",
+    "test": "npm run test -w backend && npm run test -w frontend",
+    "test:e2e": "playwright test",
+    "db:seed:docker": "npm run db:seed:docker -w backend",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@playwright/test": "^1.63.0",
+    "concurrently": "^9.1.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
+    "prettier": "^3.5.3"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "overrides": {
+    "body-parser": "1.20.6",
+    "qs": "^6.16.0",
+    "minimatch": "10.2.6",
+    "deepmerge-ts": "8.0.2"
+  }
+}

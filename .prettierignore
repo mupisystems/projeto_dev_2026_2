@@ -1,0 +1,23 @@
+# Dependências e artefatos de build
+node_modules/
+dist/
+build/
+coverage/
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Banco e logs
+*.log
+prisma/migrations/*/migration.sql
+
+# Documentação local do desafio (não rastreada pelo Git)
+docs/
+
+# README original do desafio, preservado até a documentação final
+README.md
+
+# Husky
+.husky/_/

@@ -1,0 +1,13 @@
+# Ignora arquivos desnecessarios no contexto de build do backend.
+
+node_modules
+dist
+.git
+.env
+.env.local
+.env.*.local
+*.md
+coverage
+.vscode
+.idea
+npm-debug.log*

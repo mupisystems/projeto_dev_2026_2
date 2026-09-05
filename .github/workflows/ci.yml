@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feat/**'
+      - 'fix/**'
+      - 'docs/**'
+      - 'chore/**'
+      - 'test/**'
+      - 'refactor/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  quality:
+    name: Qualidade e Testes
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: odontoagenda
+          POSTGRES_PASSWORD: odontoagenda
+          POSTGRES_DB: odontoagenda
+        ports:
+          - 5432:5432
+        options: --health-cmd "pg_isready -U odontoagenda" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://odontoagenda:odontoagenda@localhost:5432/odontoagenda?schema=public
+      JWT_SECRET: chave-secreta-de-teste-ci-minimo-32-caracteres
+      ADMIN_PASSWORD: admin123
+      VITE_API_URL: http://localhost:3000/api
+      NODE_ENV: test
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configura Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Instala dependências
+        run: npm ci
+
+      - name: Gera Prisma Client
+        run: npm run db:generate -w backend
+
+      - name: Aplica migrações e seed do banco
+        run: |
+          npm run db:deploy -w backend
+          npm run db:seed -w backend
+
+      - name: Verifica formatação
+        run: npm run format:check
+
+      - name: Roda lint
+        run: npm run lint
+
+      - name: Verifica tipos
+        run: npm run type-check
+
+      - name: Roda testes unitários
+        run: npm run test
+
+      - name: Roda testes de integração
+        run: npm run test:integration -w backend
+
+      - name: Instala navegador Playwright (Chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Roda testes de ponta a ponta (E2E)
+        run: npm run test:e2e
+
+      - name: Salva artefatos de testes E2E em caso de falha
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Build
+        run: npm run build
+
+      - name: Auditoria de dependências
+        run: npm audit --audit-level moderate
+        continue-on-error: true

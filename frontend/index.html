@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/images/logo.png" />
+  <link rel="apple-touch-icon" href="/images/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sistema de agendamentos e atendimento odontológico da Clínica Sorriso Mineiro em Montes Claros - MG." />
+  <meta name="theme-color" content="#0E7490" />
+  <title>Sorriso Mineiro — Odontologia Humanizada & Tecnologia</title>
+
+  <!-- Preconnect para otimização de fontes e performance (Core Web Vitals) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Script inline Anti-FOUC para prevenir flash de tema incorreto no carregamento -->
+  <script>
+    (function () {
+      try {
+        var temaSalvo = localStorage.getItem('theme');
+        var prefereEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (temaSalvo === 'dark' || (!temaSalvo && prefereEscuro) || (temaSalvo === 'system' && prefereEscuro)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

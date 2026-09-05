@@ -1,0 +1,77 @@
+// Esse arquivo define o schema do banco de dados PostgreSQL.
+// Mantemos os nomes em portugues para refletir o dominio do negocio.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Procedimento {
+  id             String        @id @default(uuid())
+  titulo         String
+  ativa          Boolean       @default(true)
+  preco          Decimal?      @db.Decimal(10, 2)
+  duracaoMinutos Int?          @map("duracao_minutos")
+  criadoEm       DateTime      @default(now()) @map("criado_em")
+  atualizadoEm   DateTime      @updatedAt @map("atualizado_em")
+  agendamentos   Agendamento[]
+
+  @@index([ativa])
+  @@map("procedimentos")
+}
+
+model Agendamento {
+  id             String            @id @default(uuid())
+  nome           String
+  email          String
+  telefone       String?
+  data           DateTime          @db.Date
+  horario        String
+  status         StatusAgendamento @default(PENDENTE)
+  observacao     String?
+  procedimentoId String            @map("procedimento_id")
+  procedimento   Procedimento      @relation(fields: [procedimentoId], references: [id])
+  criadoEm       DateTime          @default(now()) @map("criado_em")
+  atualizadoEm   DateTime          @updatedAt @map("atualizado_em")
+  historico      HistoricoStatus[]
+
+  @@unique([email, data, horario])
+  @@index([email, data, horario])
+  @@index([status])
+  @@index([nome])
+  @@index([email])
+  @@map("agendamentos")
+}
+
+model HistoricoStatus {
+  id             String             @id @default(uuid())
+  agendamentoId  String             @map("agendamento_id")
+  agendamento    Agendamento        @relation(fields: [agendamentoId], references: [id], onDelete: Cascade)
+  statusAnterior StatusAgendamento?
+  statusNovo     StatusAgendamento
+  alteradoEm     DateTime           @default(now()) @map("alterado_em")
+
+  @@map("historico_status")
+}
+
+model Usuario {
+  id       String   @id @default(uuid())
+  email    String   @unique
+  nome     String
+  senha    String
+  admin    Boolean  @default(true)
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  @@map("usuarios")
+}
+
+enum StatusAgendamento {
+  PENDENTE
+  CONFIRMADO
+  CANCELADO
+  ATENDIDO
+}
